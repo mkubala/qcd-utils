@@ -7,6 +7,6 @@ View preview is just a XSLT, which translate Qcadoo View XML into HTML so all th
 ### Usage
 For OSX with built in 'xsltproc':
 ```
-xsltproc -o outputFileName.html path/to/view-preview.xsl qcadooViewFileToTransform.xml
+xsltproc -o output/dir/outputFileName.html path/to/sources/view-preview.xsl qcadooViewFileToTransform.xml && cp -a path/to/sources/assets output/dir/*
 ```
 

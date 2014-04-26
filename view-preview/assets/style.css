@@ -1,0 +1,72 @@
+div.windowTab {
+    background-color: #EEEEEE;
+    border: 1px solid #333333;
+    padding: 5px;
+    margin: 25px;
+    /*width: 1100px;*/
+}
+
+#tip {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background-color: #333333;
+    color: #cccccc;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+div.componentPlaceholder {
+    background-color: #666666;
+    color: #ffffff;
+    /*height: 35px;*/
+    /*line-height: 35px;*/
+}
+
+div.componentPlaceholder.tree,
+div.componentPlaceholder.grid,
+div.componentPlaceholder.textarea,
+div.componentPlaceholder.awesomeDynamicList {
+    background-color: #222222;
+    height: 100%;
+}
+
+div.gridLayout,
+div.borderLayout {
+    position: relative;
+}
+
+div.gridLayout div.desc,
+div.borderLayout div.desc {
+    display: none;
+}
+
+div.gridLayout div.content,
+div.borderLayout div.content {
+    position: relative;
+}
+
+div.gridLayout {
+    border: 1px solid #0000FF;
+    padding: 5px;
+}
+
+div.borderLayout {
+    border: 1px solid #222222;
+    padding: 5px;
+    /*margin: -3px;*/
+}
+
+div.layoutElement {
+    position: absolute;
+    border: 1px dotted #222;
+    /*margin: 5px;*/
+    padding: 5px;
+    background-color: #cccccc;
+    /*width: 10%;*/
+}
+
+div.layoutElement div.content {
+    position: relative;
+}
+

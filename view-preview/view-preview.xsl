@@ -8,6 +8,10 @@
 
 	<xsl:strip-space elements="*" />
 
+	<xsl:variable name="padding">5</xsl:variable>
+	<xsl:variable name="margin">5</xsl:variable>
+	<xsl:variable name="border">1</xsl:variable>
+
 	<xsl:template name="windowTab">
 		<xsl:param name="name" />
 		<xsl:param name="reference" />
@@ -23,7 +27,7 @@
 					<xsl:value-of select="900" />
 				</xsl:with-param>
 				<xsl:with-param name="height">
-					<xsl:value-of select="900" />
+					<xsl:value-of select="300" />
 				</xsl:with-param>
 			</xsl:apply-templates>
 		</div>
@@ -32,9 +36,10 @@
 	<xsl:template match="//qcd:view//qcd:script"></xsl:template>
 
 	<xsl:template match="//qcd:view">
+
 		<html>
 			<head>
-				<link rel="stylesheet" type="text/css" href="style.css" />
+				<link rel="stylesheet" type="text/css" href="assets/style.css" />
 			</head>
 			<body>
 				<xsl:apply-templates>
@@ -45,6 +50,11 @@
 						<xsl:value-of select="900" />
 					</xsl:with-param>
 				</xsl:apply-templates>
+				<div id="tip">
+					<span id="tipContent">XXX</span>
+				</div>
+				<script src="./assets/jquery-1.11.0.min.js">//</script>
+				<script src="./assets/engine.js">//</script>
 			</body>
 		</html>
 	</xsl:template>
@@ -57,92 +67,65 @@
 	</xsl:template>
 
 	<xsl:template
-			match="//qcd:component[@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList']">
+			match="//qcd:component[not (@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList')]">
+		<xsl:param name="width" />
+		<xsl:param name="height" />
 		<div>
 			<xsl:attribute name="class">
-				<xsl:value-of select="concat('componentPlaceholder ', @type)" />
+				<xsl:value-of select="@type" />
+			</xsl:attribute>
+			<xsl:apply-templates>
+				<xsl:with-param name="height" select="$height" />
+				<xsl:with-param name="width" select="$width" />
+			</xsl:apply-templates>
+		</div>
+	</xsl:template>
+
+	<xsl:template
+			match="//qcd:component[@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList' or @type='borderLayout' or @type='gridLayout']">
+		<xsl:param name="width" />
+		<xsl:param name="height" />
+		<div>
+			<xsl:attribute name="class">
+				<xsl:value-of select="concat('viewElement componentPlaceholder ', @type)" />
+			</xsl:attribute>
+			<xsl:attribute name="style">
+				<xsl:variable name="effectiveHeight">
+					<xsl:choose>
+						<xsl:when test="$height &lt; 30">
+							<xsl:value-of select="$height" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="30" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<xsl:value-of
+						select="concat('width: ', $width, 'px; height ', $effectiveHeight, 'px; line-height: ', $effectiveHeight ,'px;')" />
 			</xsl:attribute>
 			<xsl:value-of select="@name" />
 		</div>
 	</xsl:template>
 
-	<!--<xsl:template-->
-	<!--match="//qcd:component[@type='grid' or @type='tree' or @type='awesomeDynamicList']">-->
-	<!--<xsl:param name="width" />-->
-	<!--<xsl:param name="height" />-->
-	<!--<div class="bigComponentPlaceholder">-->
-	<!--&lt;!&ndash;<xsl:attribute name="style">&ndash;&gt;-->
-	<!--&lt;!&ndash;<xsl:value-of select="concat('width: ', $width, 'px; height: ', $height, 'px;')" />&ndash;&gt;-->
-	<!--&lt;!&ndash;</xsl:attribute>&ndash;&gt;-->
-	<!--<xsl:attribute name="style">-->
-	<!--<xsl:value-of select="'width: 100%; height: 100%;'" />-->
-	<!--</xsl:attribute>-->
-	<!--<xsl:value-of select="@name" />-->
-	<!--</div>-->
-	<!--</xsl:template>-->
-
-	<xsl:template match="//qcd:view//qcd:component[@type='gridLayout']/qcd:layoutElement">
-		<xsl:param name="width" />
-		<xsl:param name="height" />
-		<div>
-
-			<xsl:attribute name="class">
-				<xsl:value-of select="'layoutElement '" />
-			</xsl:attribute>
-			<xsl:attribute name="style">
-				<xsl:variable name="h">
-					<xsl:choose>
-						<xsl:when test="@height">
-							<xsl:value-of select="@height" />
-						</xsl:when>
-						<xsl:otherwise>1</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:variable name="w">
-					<xsl:choose>
-						<xsl:when test="@width">
-							<xsl:value-of select="@width" />
-						</xsl:when>
-						<xsl:otherwise>1</xsl:otherwise>
-					</xsl:choose>
-				</xsl:variable>
-				<xsl:value-of
-						select="concat('width: ', $width * $w - ($w * 11), 'px; height: ', $height * $h + (($h - 1) * 20), 'px; left: ', ($width * (@column - 1) + ((@column - 1) * 11)), 'px; top: ', ($height * (@row - 1)) + ((@row - 1) * 20), 'px;')" />
-			</xsl:attribute>
-
-			<div class="content">
-				<xsl:apply-templates>
-					<xsl:with-param name="width">
-						<xsl:value-of select="$width" />
-					</xsl:with-param>
-					<xsl:with-param name="height">
-						<xsl:value-of select="$height" />
-					</xsl:with-param>
-				</xsl:apply-templates>
-			</div>
-		</div>
-
-	</xsl:template>
-
 	<xsl:template match="//qcd:view//qcd:component[@type='borderLayout' or @type='gridLayout']">
 		<xsl:param name="width" />
 		<xsl:param name="height" />
+
+		<xsl:variable name="effectiveWidth">
+			<xsl:value-of select="$width - 2 * ($padding + $border)" />
+		</xsl:variable>
+
+		<xsl:variable name="effectiveHeight">
+			<xsl:value-of select="$height - 2 *($padding + $border)" />
+		</xsl:variable>
+
 		<div>
 			<xsl:attribute name="class">
-				<xsl:value-of select="concat(@type, ' ')" />
+				<xsl:value-of select="concat('viewElement ', @type, ' ')" />
 			</xsl:attribute>
 			<xsl:attribute name="style">
-				<xsl:choose>
-					<xsl:when test="@type='gridLayout'">
-						<xsl:value-of
-								select="concat('width: ', $width, 'px; height: ', @rows * 55, 'px;')" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of
-								select="'width: 100%;'" />
-					</xsl:otherwise>
-				</xsl:choose>
-
+				<xsl:value-of
+						select="concat('width: ', $effectiveWidth, 'px; height: ', $effectiveHeight, 'px;')" />
 			</xsl:attribute>
 
 			<div class="desc">
@@ -160,15 +143,97 @@
 					<xsl:with-param name="width">
 						<xsl:choose>
 							<xsl:when test="@type='gridLayout'">
-								<xsl:value-of select="(number($width) - 27) div number(@columns)" />
+								<xsl:choose>
+									<xsl:when test="@columns > 1">
+										<xsl:value-of
+												select="(($effectiveWidth) div @columns) - $padding" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of
+												select="$effectiveWidth" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="number($width) - 27" />
+								<xsl:value-of select="$effectiveWidth" />
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:with-param>
 					<xsl:with-param name="height">
-						<xsl:value-of select="35" />
+						<xsl:choose>
+							<xsl:when test="@type='gridLayout'">
+								<xsl:choose>
+									<xsl:when test="@rows > 1">
+										<xsl:value-of
+												select="(($effectiveHeight) div @rows) - $padding" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of
+												select="$effectiveHeight" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of select="$effectiveHeight" />
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
+				</xsl:apply-templates>
+			</div>
+		</div>
+
+	</xsl:template>
+
+	<xsl:template match="//qcd:view//qcd:component[@type='gridLayout']/qcd:layoutElement">
+		<xsl:param name="width" />
+		<xsl:param name="height" />
+
+		<xsl:variable name="rowSpan">
+			<xsl:choose>
+				<xsl:when test="@height">
+					<xsl:value-of select="@height" />
+				</xsl:when>
+				<xsl:otherwise>1</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="colSpan">
+			<xsl:choose>
+				<xsl:when test="@width">
+					<xsl:value-of select="@width" />
+				</xsl:when>
+				<xsl:otherwise>1</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
+		<xsl:variable name="effectiveWidth">
+			<xsl:value-of select="($width) * $colSpan + ($colSpan - 1) * ($padding + $border)" />
+		</xsl:variable>
+
+		<xsl:variable name="effectiveHeight">
+			<xsl:value-of select="($height) * $rowSpan + ($rowSpan - 1) * ($padding + $border)" />
+		</xsl:variable>
+
+		<div>
+			<xsl:attribute name="class">
+				<xsl:value-of select="'viewElement layoutElement '" />
+			</xsl:attribute>
+			<xsl:attribute name="style">
+				<xsl:value-of
+						select="concat('width: ', $effectiveWidth - 2*($padding + $border), 'px; ',
+						'height: ', $effectiveHeight - 2 * ($padding + $border), 'px; ',
+						'left: ', (@column - 1) * ($width + $padding + $border), 'px; ',
+						'top: ', (@row - 1) * ($height + $padding + $border), 'px;')" />
+			</xsl:attribute>
+
+			<div class="content">
+				<xsl:apply-templates>
+					<xsl:with-param name="width">
+						<xsl:value-of
+								select="$effectiveWidth - 2*($padding + $border)" />
+					</xsl:with-param>
+					<xsl:with-param name="height">
+						<xsl:value-of
+								select="$effectiveHeight - 2*($padding + $border)" />
 					</xsl:with-param>
 				</xsl:apply-templates>
 			</div>
