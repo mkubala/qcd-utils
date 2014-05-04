@@ -103,6 +103,24 @@
 				<xsl:value-of
 						select="concat('width: ', $width, 'px; height ', $effectiveHeight, 'px; line-height: ', $effectiveHeight ,'px;')" />
 			</xsl:attribute>
+			<div class="desc">
+				<xsl:value-of select="concat('type: ', @type, ' ')" />
+				<br />
+				<xsl:value-of select="concat('name: ', @name, ' ')" />
+				<br />
+				<xsl:if test="@reference">
+					<xsl:value-of select="concat('reference: ', @reference, ' ')" />
+					<br />
+				</xsl:if>
+				<xsl:if test="@field">
+					<xsl:value-of select="concat('field: ', @field, ' ')" />
+					<br />
+				</xsl:if>
+				<xsl:if test="@source">
+					<xsl:value-of select="concat('source: ', @source, ' ')" />
+					<br />
+				</xsl:if>
+			</div>
 			<xsl:value-of select="@name" />
 		</div>
 	</xsl:template>
@@ -129,12 +147,17 @@
 			</xsl:attribute>
 
 			<div class="desc">
+				<xsl:value-of select="concat('type: ', @type, ' ')" />
+				<br />
 				<xsl:value-of select="concat('name: ', @name, ' ')" />
+				<br />
 				<xsl:if test="@reference">
 					<xsl:value-of select="concat('reference: ', @reference, ' ')" />
+					<br />
 				</xsl:if>
 				<xsl:if test="@type='gridLayout'">
 					<xsl:value-of select="concat('dimensions: ', @columns, ' x ', @rows, ' ')" />
+					<br />
 				</xsl:if>
 			</div>
 
@@ -224,6 +247,15 @@
 						'left: ', (@column - 1) * ($width + $padding + $border), 'px; ',
 						'top: ', (@row - 1) * ($height + $padding + $border), 'px;')" />
 			</xsl:attribute>
+
+			<div class="desc">
+				type: layoutElement
+				<br />
+				<xsl:value-of select="concat('position: (', @column, ', ', @row, ') ')" />
+				<br />
+				<xsl:value-of select="concat('dimmensions: ', $colSpan, ' x ', $rowSpan, ' ')" />
+				<br />
+			</div>
 
 			<div class="content">
 				<xsl:apply-templates>
