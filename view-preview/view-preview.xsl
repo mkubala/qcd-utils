@@ -12,27 +12,6 @@
 	<xsl:variable name="margin">5</xsl:variable>
 	<xsl:variable name="border">1</xsl:variable>
 
-	<xsl:template name="windowTab">
-		<xsl:param name="name" />
-		<xsl:param name="reference" />
-
-		<div>
-			<xsl:attribute name="class">
-				<xsl:value-of
-						select="concat('windowTab ', $name, $reference)" />
-			</xsl:attribute>
-			<xsl:value-of select="$name" />
-			<xsl:apply-templates>
-				<xsl:with-param name="width">
-					<xsl:value-of select="900" />
-				</xsl:with-param>
-				<xsl:with-param name="height">
-					<xsl:value-of select="300" />
-				</xsl:with-param>
-			</xsl:apply-templates>
-		</div>
-	</xsl:template>
-
 	<xsl:template match="//qcd:view//qcd:script"></xsl:template>
 
 	<xsl:template match="//qcd:view">
@@ -49,6 +28,7 @@
 					<xsl:with-param name="height">
 						<xsl:value-of select="900" />
 					</xsl:with-param>
+					<xsl:with-param name="path" select="concat('plugin_name.', @name)" />
 				</xsl:apply-templates>
 				<div id="tip">
 					<span id="tipContent">XXX</span>
@@ -60,16 +40,34 @@
 	</xsl:template>
 
 	<xsl:template match="//qcd:view//qcd:windowTab">
-		<xsl:call-template name="windowTab">
-			<xsl:with-param name="name" select="@name" />
-			<xsl:with-param name="reference" select="@reference" />
-		</xsl:call-template>
+		<xsl:param name="path" />
+
+		<div>
+			<xsl:attribute name="class">
+				<xsl:value-of
+						select="concat('windowTab viewElement ', @name, @reference)" />
+			</xsl:attribute>
+			<div class="desc">
+				<xsl:value-of select="$path" />
+			</div>
+			<xsl:value-of select="@name" />
+			<xsl:apply-templates>
+				<xsl:with-param name="width">
+					<xsl:value-of select="900" />
+				</xsl:with-param>
+				<xsl:with-param name="height">
+					<xsl:value-of select="300" />
+				</xsl:with-param>
+				<xsl:with-param name="path" select="concat($path, '.', @name)" />
+			</xsl:apply-templates>
+		</div>
 	</xsl:template>
 
 	<xsl:template
 			match="//qcd:component[not (@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList')]">
 		<xsl:param name="width" />
 		<xsl:param name="height" />
+		<xsl:param name="path" />
 		<div>
 			<xsl:attribute name="class">
 				<xsl:value-of select="@type" />
@@ -77,14 +75,16 @@
 			<xsl:apply-templates>
 				<xsl:with-param name="height" select="$height" />
 				<xsl:with-param name="width" select="$width" />
+				<xsl:with-param name="path" select="concat($path, '.', @name)" />
 			</xsl:apply-templates>
 		</div>
 	</xsl:template>
 
 	<xsl:template
-			match="//qcd:component[@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList' or @type='borderLayout' or @type='gridLayout']">
+			match="//qcd:component[@type='lookup' or @type='input' or @type='date' or @type='select' or @type='textarea' or @type='grid' or @type='tree' or @type='awesomeDynamicList']">
 		<xsl:param name="width" />
 		<xsl:param name="height" />
+		<xsl:param name="path" />
 		<div>
 			<xsl:attribute name="class">
 				<xsl:value-of select="concat('viewElement componentPlaceholder ', @type)" />
@@ -104,6 +104,14 @@
 						select="concat('width: ', $width, 'px; height ', $effectiveHeight, 'px; line-height: ', $effectiveHeight ,'px;')" />
 			</xsl:attribute>
 			<div class="desc">
+				<xsl:call-template name="componentPath">
+					<xsl:with-param name="path" select="$path" />
+				</xsl:call-template>
+				<xsl:call-template name="componentTranslations">
+					<xsl:with-param name="path" select="$path" />
+					<xsl:with-param name="node" select="." />
+				</xsl:call-template>
+				<br />
 				<xsl:value-of select="concat('type: ', @type, ' ')" />
 				<br />
 				<xsl:value-of select="concat('name: ', @name, ' ')" />
@@ -128,6 +136,7 @@
 	<xsl:template match="//qcd:view//qcd:component[@type='borderLayout' or @type='gridLayout']">
 		<xsl:param name="width" />
 		<xsl:param name="height" />
+		<xsl:param name="path" />
 
 		<xsl:variable name="effectiveWidth">
 			<xsl:value-of select="$width - 2 * ($padding + $border)" />
@@ -147,6 +156,14 @@
 			</xsl:attribute>
 
 			<div class="desc">
+				<xsl:call-template name="componentPath">
+					<xsl:with-param name="path" select="$path" />
+				</xsl:call-template>
+				<xsl:call-template name="componentTranslations">
+					<xsl:with-param name="path" select="$path" />
+					<xsl:with-param name="node" select="." />
+				</xsl:call-template>
+				<br />
 				<xsl:value-of select="concat('type: ', @type, ' ')" />
 				<br />
 				<xsl:value-of select="concat('name: ', @name, ' ')" />
@@ -201,6 +218,7 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:with-param>
+					<xsl:with-param name="path" select="$path" />
 				</xsl:apply-templates>
 			</div>
 		</div>
@@ -210,6 +228,7 @@
 	<xsl:template match="//qcd:view//qcd:component[@type='gridLayout']/qcd:layoutElement">
 		<xsl:param name="width" />
 		<xsl:param name="height" />
+		<xsl:param name="path" />
 
 		<xsl:variable name="rowSpan">
 			<xsl:choose>
@@ -249,9 +268,12 @@
 			</xsl:attribute>
 
 			<div class="desc">
+				<xsl:value-of select="$path" />
+				<br />
 				type: layoutElement
 				<br />
-				<xsl:value-of select="concat('position: (', @column, ', ', @row, ') ')" />
+				<xsl:value-of select="concat('position: (', @column, ', ', @row
+				, ') ')" />
 				<br />
 				<xsl:value-of select="concat('dimmensions: ', $colSpan, ' x ', $rowSpan, ' ')" />
 				<br />
@@ -267,10 +289,108 @@
 						<xsl:value-of
 								select="$effectiveHeight - 2*($padding + $border)" />
 					</xsl:with-param>
+					<xsl:with-param name="path" select="$path" />
 				</xsl:apply-templates>
 			</div>
 		</div>
 
+	</xsl:template>
+
+	<xsl:template name="componentPath">
+		<xsl:param name="path" />
+		path:
+		<xsl:value-of select="$path" />
+		<br />
+	</xsl:template>
+
+	<xsl:template name="componentTranslations">
+		<xsl:param name="path" />
+		<xsl:param name="node" />
+
+		<xsl:variable name="type" select="$node/@type" />
+
+		XXX:
+		<xsl:value-of select="$type" />
+
+		<xsl:choose>
+			<xsl:when test="$node/@type='borderLayout'">
+				<xsl:call-template name="borderLayoutTranslations">
+					<xsl:with-param name="path" select="$path" />
+					<xsl:with-param name="node" select="$node" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="fieldComponentTranslations">
+					<xsl:with-param name="path" select="$path" />
+					<xsl:with-param name="node" select="$node" />
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="fieldComponentTranslations">
+		<xsl:param name="path" />
+		<xsl:param name="node" />
+
+		<xsl:variable name="name" select="$node/@name" />
+		<xsl:variable name="field" select="$node/@field" />
+		<xsl:variable name="modelName" select="/qcd:view/@modelName" />
+
+		translation keys:
+		<ul>
+			<li>label:
+				<ul>
+					<li>
+						<xsl:value-of select="concat($path, '.', $name, '.label')" />
+					</li>
+					<xsl:if test="$field">
+						<li>
+							<xsl:value-of select="concat('plugin.', $modelName, '.', $field, '.label')" />
+						</li>
+						<li>
+							<xsl:value-of select="concat('[btPlugin].[btModel].', $field, '.label')" />
+						</li>
+					</xsl:if>
+				</ul>
+			</li>
+			<xsl:if test="$node/@hasDescription='true'">
+				<li>description:
+					<ul>
+						<li>
+							<xsl:value-of select="concat($path, '.', $name, '.description')" />
+						</li>
+					</ul>
+				</li>
+				<li>descriptionHeader:
+					<ul>
+						<li>TODO</li>
+						<li>qcadooView.form.descriptionHeader</li>
+					</ul>
+				</li>
+			</xsl:if>
+
+		</ul>
+	</xsl:template>
+
+	<xsl:template name="borderLayoutTranslations">
+		<xsl:param name="path" />
+		<xsl:param name="node" />
+
+		<xsl:variable name="name" select="$node/@name" />
+		<xsl:variable name="labelName" select="$node/qcd:option[@type='label']/@value" />
+
+		translation keys:
+		<ul>
+			<xsl:if test="$labelName">
+				<li>label:
+					<ul>
+						<li>
+							<xsl:value-of select="concat($path, '.', $labelName)" />
+						</li>
+					</ul>
+				</li>
+			</xsl:if>
+		</ul>
 	</xsl:template>
 
 </xsl:stylesheet>

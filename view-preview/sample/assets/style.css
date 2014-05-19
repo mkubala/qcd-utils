@@ -33,8 +33,7 @@ div.borderLayout {
     position: relative;
 }
 
-div.gridLayout div.desc,
-div.borderLayout div.desc {
+div.viewElement div.desc {
     display: none;
 }
 
@@ -67,5 +66,14 @@ div.layoutElement div.content {
 .viewElement.focused {
     border: 2px solid red;
     margin: -1px;
+}
+
+.windowTab {
+    width: 900px;
+}
+
+.windowTab.focused {
+    border: 2px solid red;
+    margin: 24px;
 }
 
